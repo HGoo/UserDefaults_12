@@ -14,30 +14,27 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet var firstNameField: UITextField!
     @IBOutlet var secondNameField: UITextField!
     
-    // MARK: - Private Properties
+    // MARK: - Publick Properties
     let primaryColor = UIColor(red: 210/255, green: 109/255, blue: 128/255, alpha: 1)
     let secondaryColor = UIColor(red: 50/255, green: 50/255, blue: 50/255, alpha: 1)
     
-    // MARK: - Publick Properties
-    
+    // MARK: - Private Properties
+    private var user = User()
+  
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         addVerticalGradientLayer(topColor: primaryColor, bottomColor: secondaryColor)
         
-        userNameLable.isHidden = true
         firstNameField.delegate = self
         secondNameField.delegate = self
         
-        if let userName = UserDefaults.standard.value(forKey: "fullName") {
-            userNameLable.isHidden = false
-            userNameLable.text = userName as? String
-        }
+        setUserData()
     }
     
     // MARK: - Methods
-    func changeLable() { //слишком большой метод
+    func changeLable() {
         guard let firstName = firstNameField.text, !(firstName.isEmpty) else {
             wrongFotmatAlert(fieldNmae: "first ")
             return
@@ -55,8 +52,10 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
             return
         } else {
             userNameLable.text = firstName + "\n" + secondName
-            userNameLable.isHidden = false
-            saveUserData()
+            user.name = firstName
+            user.surname = secondName
+            //StorageManager.shared.saveUser(user)
+            StorageManager.shared.saveUserToFile(user)
         }
         
         firstNameField.text = nil
@@ -65,21 +64,18 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     }
     
     // MARK: - Private Methods
-    func saveUserData() {
-        UserDefaults.standard.set(userNameLable.text, forKey: "fullName")
+    private func setUserData() {
+        //user = StorageManager.shared.getUser()
+        
+        user = StorageManager.shared.getUserfromFile()
+        userNameLable.text = user.name + " " + user.surname
     }
-    
     
     // MARK: - IBActions
     @IBAction func doneButton(_ sender: UIButton) {
         
         sender.pulse()
         changeLable()
-        
     }
-    
-    // MARK: - Navigation
-    
 }
-
 
